@@ -1,3 +1,7 @@
+package TRPG;
+
+import TRPG.Model;
+
 import java.lang.Math;
 import java.nio.FloatBuffer;
 import java.io.FileInputStream;
@@ -29,11 +33,12 @@ public class TRPG{
 	private static boolean qDown = false;
 	private static boolean eDown = false;
 	private static boolean axes = false;
-	private static boolean lights = false;
+	public static boolean lights = false;
 	private static Random rand = new Random();
 	private static Texture tex_grass;
 	private static Texture tex_grassside;
 	private static Texture tex_crate;
+	private static Model box;
 	
 	private static float[][] heightMap = new float[40][40];
 
@@ -78,7 +83,7 @@ public class TRPG{
 		{3, 0, 1, 2},
 		{2, 3, 0, 1}
 	};
-	private static void modelCube(float size, float xpos, float ypos, float zpos){
+	private static void modelCrate(float size, float xpos, float ypos, float zpos){
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex_crate.getTextureID());
 		GL11.glBegin(GL11.GL_QUADS);
 		// Draw all six sides of the cube.
@@ -93,6 +98,7 @@ public class TRPG{
 			}
 		}
 		GL11.glEnd();
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
 	private static void terrainBlock(float xpos, float zpos, float height){
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex_grassside.getTextureID());
@@ -117,6 +123,7 @@ public class TRPG{
 			}
 		}
 		GL11.glEnd();
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
 
 	public void start() {
@@ -124,6 +131,7 @@ public class TRPG{
 		try {
 			Display.setDisplayMode(new DisplayMode(800,600));
 			Display.setTitle("3D Test");
+			Display.setVSyncEnabled(true);
 			Display.create();
 		} catch (LWJGLException e) {
 			e.printStackTrace();
@@ -131,13 +139,16 @@ public class TRPG{
 		}
 		// Load image
 		try {
-			tex_grass = TextureLoader.getTexture("PNG", new FileInputStream("assets/grass16.png"));
-			tex_grassside = TextureLoader.getTexture("PNG", new FileInputStream("assets/grassside16.png"));
-			tex_crate = TextureLoader.getTexture("PNG", new FileInputStream("assets/crate16.png"));
+			tex_grass = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/grass16.png"));
+			tex_grassside = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/grassside16.png"));
+			tex_crate = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/crate16.png"));
 		} catch (IOException ex) {
 			System.out.println("Failed to load texture");
 			return;
 		}
+		// Load Model test
+		box = new Model("Box");
+		box.load();
 
 		// init OpenGL
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -176,8 +187,6 @@ public class TRPG{
 			if(lights){
 				GL11.glDisable(GL11.GL_LIGHTING);
 			}
-			// Clear texture
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 			// Draw Quad
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glColor3f(0f,0f,0f);
@@ -360,17 +369,23 @@ public class TRPG{
 			floatBuffer.flip();
 			GL11.glMaterial(GL11.GL_FRONT, GL11.GL_AMBIENT_AND_DIFFUSE, floatBuffer);//*/
 			if(pos[0] >= -20f && pos[0] < 20f && pos[2] >= -20f && pos[2] < 20f){
-				modelCube(1f, pos[0], heightMap[(int)pos[0]+20][(int)pos[2]+20], pos[2]);
+				//modelCrate(1f, pos[0], heightMap[(int)pos[0]+20][(int)pos[2]+20], pos[2]);
+				box.xpos = pos[0];
+				box.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
+				box.zpos = pos[2];
 			}else{
-				modelCube(1f, pos[0], 0f, pos[2]);
+				//modelCrate(1f, pos[0], 0f, pos[2]);
+				box.xpos = pos[0];
+				box.ypos = 0f;
+				box.zpos = pos[2];
 			}
+			box.render();
+			
 			
 			// Axes
 			if(axes){
 				// Reset depth bit
 				GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-				// Clear texture
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 				// Check for lights, disable if necessary
 				if(lights){
 					GL11.glDisable(GL11.GL_LIGHTING);
