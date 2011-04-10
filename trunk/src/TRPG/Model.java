@@ -201,7 +201,7 @@ public class Model{
 			if(model.hasNormal){
 				GL11.glNormal3f(model.quadNormal[voff],model.quadNormal[voff+1],model.quadNormal[voff+2]);
 			}
-			if(model.hasColor && (!TRPG.lights && !model.hasTexture)){
+			if(model.hasColor){
 				coff = q*4;
 				GL11.glColor4b(model.quadColor[coff],model.quadColor[coff+1],model.quadColor[coff+2],model.quadColor[coff+3]);
 			}
