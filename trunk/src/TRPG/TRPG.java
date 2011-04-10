@@ -35,10 +35,9 @@ public class TRPG{
 	private static boolean axes = false;
 	public static boolean lights = false;
 	private static Random rand = new Random();
-	private static Texture tex_grass;
-	private static Texture tex_grassside;
 	private static Model box;
-	
+	private static Model grass;
+
 	private static float[][] heightMap = new float[40][40];
 
 	// Ascii table to ensure consistency accross platforms
@@ -51,74 +50,6 @@ public class TRPG{
 		'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'
 	};
 
-	// Cube data from example 2-16
-   private static final float[][] vertices = {
-		{0f, 0f, 0f},// 0
-		{1f, 0f, 0f},//  1
-		{1f, 1f, 0f},//   2
-		{0f, 1f, 0f},//  3
-		{0f, 0f, 1f},//  4
-		{1f, 0f, 1f},//   5
-		{1f, 1f, 1f},//    6
-		{0f, 1f, 1f}//    7
-   };
-   private static final float[][] normals = {
-		{0f, 0f, 1f},
-		{0f, 0f, -1f},
-		{1f, 0f, 0f},
-		{-1f, 0f, 0f},
-		{0f, 1f, 0f},
-		{0f, -1f, 0f}
-   };
-   private static final byte[][] indices = {
-		{4, 5, 6, 7},
-		{0, 3, 2, 1},
-		{1, 2, 6, 5},
-		{0, 4, 7, 3},
-		{3, 7, 6, 2},
-		{0, 1, 5, 4}
-   };
-	private static final float[][] tex = {
-		{0f, 0f},
-		{1f, 0f},
-		{1f, 1f},
-		{0f, 1f}
-	};
-	private static final byte[][] texIndex = {
-		{0, 1, 2, 3},
-		{1, 2, 3, 0},
-		{1, 2, 3, 0},
-		{0, 1, 2, 3},
-		{3, 0, 1, 2},
-		{2, 3, 0, 1}
-	};
-
-	private static void terrainBlock(float xpos, float zpos, float height){
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex_grassside.getTextureID());
-		GL11.glBegin(GL11.GL_QUADS);
-		// Draw all six sides of the cube.
-		for (int i = 0; i < 5; i++) {
-			if(height == 0f){
-				i = 4;
-			}
-			if(i == 4){
-				GL11.glEnd();
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex_grass.getTextureID());
-				GL11.glBegin(GL11.GL_QUADS);
-			}
-			// Draw all four vertices of the current side.
-			for (int m = 0; m < 4; m++) {
-				float[] temp = vertices[indices[i][m]];
-				float[] temp2 = tex[texIndex[i][m]];
-				GL11.glNormal3f(normals[i][0], normals[i][1], normals[i][2]);
-				GL11.glTexCoord2f(temp2[0], temp2[1]);
-				GL11.glVertex3f(temp[0] + xpos, (temp[1] * height), temp[2] + zpos);
-			}
-		}
-		GL11.glEnd();
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-	}
-
 	public void start() {
 		// init Display window
 		try {
@@ -130,17 +61,15 @@ public class TRPG{
 			e.printStackTrace();
 			System.exit(0);
 		}
-		// Load image
-		try {
-			tex_grass = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/grass16.png"));
-			tex_grassside = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/grassside16.png"));
-		} catch (IOException ex) {
-			System.out.println("Failed to load texture");
-			return;
-		}
 		// Load Model test
 		box = new Model("Box");
 		box.load();
+		box.xscale = 0.75f;
+		box.yscale = 0.75f;
+		box.zscale = 0.75f;
+		box.applyScaling = true;
+		grass = new Model("Grass");
+		grass.load();
 
 		// init OpenGL
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -152,11 +81,11 @@ public class TRPG{
 		GL11.glLoadIdentity();
 		//GL11.glScalef( 1f, 1f, -1f);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		
+
 		// Render in visual order
 		GL11.glFrontFace(GL11.GL_CCW);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		
+
 		// Light
 		float[] floatArray = new float[] {1f, 1f, 1f, 1f};
 		FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(4).put(floatArray);
@@ -174,12 +103,12 @@ public class TRPG{
 		while (!Display.isCloseRequested()) {
 			// Clear the screen and depth buffer
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-			
+
 			// Check for lights, disable if necessary
 			if(lights){
 				GL11.glDisable(GL11.GL_LIGHTING);
 			}
-			// Draw Quad
+			// Draw Background Quad
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glColor3f(0f,0f,0f);
 			GL11.glNormal3f(0f,0f,0f);
@@ -196,28 +125,14 @@ public class TRPG{
 			if(lights){
 				GL11.glEnable(GL11.GL_LIGHTING);
 			}
-			
+
 			// Reset depth bit
 			GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-			// set the color of the quad (R,G,B,A)
+			// set the color of the quad (R,G,B) - A assumed to be 1f
 			GL11.glColor3f(1f,1f,1f);
-			
+
 			pollInput();
-			/* After keys are checked, move box based on facing direction
-			if(wDown){
-				xpos += ((float)Math.sin(vang * degToRad))/7f;
-				zpos -= ((float)Math.cos(vang * degToRad))/7f;
-			}else if(sDown){
-				xpos -= ((float)Math.sin(vang * degToRad))/7f;
-				zpos += ((float)Math.cos(vang * degToRad))/7f;
-			}
-			if(aDown){
-				xpos -= ((float)Math.sin((vang+90d) * degToRad))/7f;
-				zpos += ((float)Math.cos((vang+90d) * degToRad))/7f;
-			}else if(dDown){
-				xpos += ((float)Math.sin((vang+90d) * degToRad))/7f;
-				zpos -= ((float)Math.cos((vang+90d) * degToRad))/7f;
-			}//*///* Move one step per button press, relative to facing direction
+			//* Move one step per button press, relative to facing direction
 			if(moveCoolDown > 0){
 				moveCoolDown -= 1;
 			}else{
@@ -268,8 +183,8 @@ public class TRPG{
 					moveCoolDown = 10;
 				}
 			}
-			
-			//* Camera position
+
+			//* Camera XZ position
 			dpos = pos[0] - vpos[0];
 			if(dpos >= 0.1f){
 				vpos[0] += 0.1f;
@@ -331,8 +246,11 @@ public class TRPG{
 			GL11.glPushMatrix();
 			GL11.glRotatef(30f, 1f, 0f, 0f);
 			GL11.glRotatef((float)vang, 0f, 1f, 0f);
-			GL11.glTranslatef(-vpos[0]-0.5f, -vpos[1]-0.5f, -vpos[2]-0.5f);
+			GL11.glTranslatef(-vpos[0], -vpos[1], -vpos[2]);
+
+			// Sprite Test
 			
+
 			//* Refresh light
 			floatArray[0] = 0f;
 			floatArray[1] = 15f;
@@ -343,23 +261,20 @@ public class TRPG{
 			floatBuffer.flip();
 			GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, floatBuffer);
 			//*/
-			
+
 			//* Draw Landscape
+			grass.applyScaling = true;
 			for(int j=0; j<40; j++){
 				for(int i=0; i<40; i++){
-					terrainBlock(j-20,i-20,heightMap[j][i]);
+					grass.xpos = j-20;
+					grass.zpos = i-20;
+					grass.yscale = heightMap[j][i];
+					grass.render();
 				}
 			}
 			//*/
-			/* Material
-			floatArray[0] = 1f;
-			floatArray[1] = 0f;
-			floatArray[2] = 1f;
-			floatArray[3] = 0.1f;
-			floatBuffer.clear();
-			floatBuffer.put(floatArray);
-			floatBuffer.flip();
-			GL11.glMaterial(GL11.GL_FRONT, GL11.GL_AMBIENT_AND_DIFFUSE, floatBuffer);//*/
+
+			// Update positions then render loaded Box model
 			if(pos[0] >= -20f && pos[0] < 20f && pos[2] >= -20f && pos[2] < 20f){
 				box.xpos = pos[0];
 				box.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
@@ -370,8 +285,7 @@ public class TRPG{
 				box.zpos = pos[2];
 			}
 			box.render();
-			
-			
+
 			// Axes
 			if(axes){
 				// Reset depth bit
@@ -385,27 +299,27 @@ public class TRPG{
 				GL11.glColor3f(1f, 0f, 0f);
 				GL11.glVertex3f(0f, 0f, 0f);
 				GL11.glVertex3f(2f, 0f, 0f);
-		
+
 				GL11.glColor3f(0f, 1f, 0f);
 				GL11.glVertex3f(0f, 0f, 0f);
 				GL11.glVertex3f(0f, 2f, 0f);
-	
+
 				GL11.glColor3f(0f, 0f, 1f);
 				GL11.glVertex3f(0f, 0f, 0f);
 				GL11.glVertex3f(0f, 0f, 2f);
 				//*/
 				//* Moves with camera
 				GL11.glColor3f(1f, 0f, 0f);
-				GL11.glVertex3f(vpos[0]+0.5f, vpos[1]+0.5f, vpos[2]+0.5f);
-				GL11.glVertex3f(1f+vpos[0]+0.5f, vpos[1]+0.5f, vpos[2]+0.5f);
-		
+				GL11.glVertex3f(vpos[0], vpos[1], vpos[2]);
+				GL11.glVertex3f(1f+vpos[0], vpos[1], vpos[2]);
+
 				GL11.glColor3f(0f, 1f, 0f);
-				GL11.glVertex3f(vpos[0]+0.5f, vpos[1]+0.5f, vpos[2]+0.5f);
-				GL11.glVertex3f(vpos[0]+0.5f, 1f+vpos[1]+0.5f, vpos[2]+0.5f);
-	
+				GL11.glVertex3f(vpos[0], vpos[1], vpos[2]);
+				GL11.glVertex3f(vpos[0], 1f+vpos[1], vpos[2]);
+
 				GL11.glColor3f(0f, 0f, 1f);
-				GL11.glVertex3f(vpos[0]+0.5f, vpos[1]+0.5f, vpos[2]+0.5f);
-				GL11.glVertex3f(vpos[0]+0.5f, vpos[1]+0.5f, 1f+vpos[2]+0.5f);
+				GL11.glVertex3f(vpos[0], vpos[1], vpos[2]);
+				GL11.glVertex3f(vpos[0], vpos[1], 1f+vpos[2]);
 				//*/
 				GL11.glEnd();
 				// Restore lights if necessary
@@ -413,7 +327,7 @@ public class TRPG{
 					GL11.glEnable(GL11.GL_LIGHTING);
 				}
 			}
-			
+
 			// Pop matrix
 			GL11.glPopMatrix();
 
@@ -422,7 +336,7 @@ public class TRPG{
 
 		Display.destroy();
 	}
-	
+
 	public void pollInput() {
 		/* Mouse coords
 		if(Mouse.isButtonDown(0)){
