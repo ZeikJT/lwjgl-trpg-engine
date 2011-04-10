@@ -28,9 +28,14 @@ public class Model{
 	public float xpos = 0f;
 	public float ypos = 0f;
 	public float zpos = 0f;
+	public boolean applyScaling = false;
+	public float xscale = 1f;
+	public float yscale = 1f;
+	public float zscale = 1f;
 
 	public Model(String name){
-		this(name, 0f, 0f, 0f);
+		this.name = name;
+		this.file = new File("assets/models/"+this.name+"/model.obj");
 	}
 	public Model(String name, float xpos, float ypos, float zpos){
 		this.name = name;
@@ -43,8 +48,15 @@ public class Model{
 	public boolean load(){
 		return Model.load(this);
 	}
-	
+
 	public void render(){
+		Model.render(this);
+	}
+
+	public void render(float xpos, float ypos, float zpos){
+		this.xpos = xpos;
+		this.ypos = ypos;
+		this.zpos = zpos;
 		Model.render(this);
 	}
 
@@ -180,6 +192,10 @@ public class Model{
 		int voff = 0;
 		int coff = 0;
 		int toff = 0;
+		// Calculated vertex positions
+		float xpos;
+		float ypos;
+		float zpos;
 		// Bind texture if needed
 		if(model.hasTexture){
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.textures[piece].getTextureID());
@@ -209,7 +225,16 @@ public class Model{
 				toff = q*2;
 				GL11.glTexCoord2f(model.quadTexCoord[toff], model.quadTexCoord[toff+1]);
 			}
-			GL11.glVertex3f(model.quadData[voff]+model.xpos,model.quadData[voff+1]+model.ypos,model.quadData[voff+2]+model.zpos);
+			if(model.applyScaling){
+				xpos = (model.quadData[voff]*model.xscale)+model.xpos;
+				ypos = (model.quadData[voff+1]*model.yscale)+model.ypos;
+				zpos = (model.quadData[voff+2]*model.zscale)+model.zpos;
+			}else{
+				xpos = model.quadData[voff]+model.xpos;
+				ypos = model.quadData[voff+1]+model.ypos;
+				zpos = model.quadData[voff+2]+model.zpos;
+			}
+			GL11.glVertex3f(xpos,ypos,zpos);
 		}
 		GL11.glEnd();
 		// Unbind texture if necessary
