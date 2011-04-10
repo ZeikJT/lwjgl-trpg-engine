@@ -1,6 +1,7 @@
 package TRPG;
 
 import TRPG.Model;
+import TRPG.Sprite;
 
 import java.lang.Math;
 import java.nio.FloatBuffer;
@@ -37,6 +38,7 @@ public class TRPG{
 	private static Random rand = new Random();
 	private static Model box;
 	private static Model grass;
+	private static Sprite laharl;
 
 	private static float[][] heightMap = new float[40][40];
 
@@ -68,8 +70,16 @@ public class TRPG{
 		box.yscale = 0.75f;
 		box.zscale = 0.75f;
 		box.applyScaling = true;
+		box.xpos = rand.nextInt(10)+15;
+		box.zpos = rand.nextInt(10)+15;
+		box.ypos = heightMap[(int)box.xpos][(int)box.zpos];
+		box.xpos -= 20;
+		box.zpos -= 20;
 		grass = new Model("Grass");
 		grass.load();
+		// Load Sprites
+		laharl = new Sprite("Laharl");
+		laharl.load();
 
 		// init OpenGL
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -248,9 +258,6 @@ public class TRPG{
 			GL11.glRotatef((float)vang, 0f, 1f, 0f);
 			GL11.glTranslatef(-vpos[0], -vpos[1], -vpos[2]);
 
-			// Sprite Test
-			
-
 			//* Refresh light
 			floatArray[0] = 0f;
 			floatArray[1] = 15f;
@@ -276,15 +283,25 @@ public class TRPG{
 
 			// Update positions then render loaded Box model
 			if(pos[0] >= -20f && pos[0] < 20f && pos[2] >= -20f && pos[2] < 20f){
-				box.xpos = pos[0];
-				box.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
-				box.zpos = pos[2];
+				//box.xpos = pos[0];
+				//box.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
+				//box.zpos = pos[2];
+				laharl.xpos = pos[0];
+				laharl.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
+				laharl.zpos = pos[2];
 			}else{
-				box.xpos = pos[0];
-				box.ypos = 0f;
-				box.zpos = pos[2];
+				//box.xpos = pos[0];
+				//box.ypos = 0f;
+				//box.zpos = pos[2];
+				laharl.xpos = pos[0];
+				laharl.ypos = 0f;
+				laharl.zpos = pos[2];
 			}
 			box.render();
+			
+			// Sprite Test
+			laharl.render();
+			//laharl.render(0f,heightMap[20][20],0f);
 
 			// Axes
 			if(axes){
