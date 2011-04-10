@@ -200,6 +200,8 @@ public class Model{
 		if(model.hasTexture){
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.textures[piece].getTextureID());
 		}
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glBegin(GL11.GL_QUADS);
 		for(int q=0; q<model.totalQuadCount*4; q++){
 			if(vertsToGo == 0){
@@ -237,6 +239,7 @@ public class Model{
 			GL11.glVertex3f(xpos,ypos,zpos);
 		}
 		GL11.glEnd();
+		GL11.glDisable(GL11.GL_BLEND);
 		// Unbind texture if necessary
 		if(model.hasTexture){
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);

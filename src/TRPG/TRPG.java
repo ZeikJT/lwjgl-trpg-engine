@@ -39,6 +39,7 @@ public class TRPG{
 	private static Model box;
 	private static Model grass;
 	private static Sprite laharl;
+	private static float[] boxPos;
 
 	private static float[][] heightMap = new float[40][40];
 
@@ -63,6 +64,23 @@ public class TRPG{
 			e.printStackTrace();
 			System.exit(0);
 		}
+		// Create random landscape
+		for(int i=0; i<40; i++){
+			for(int j=0; j<40; j++){
+				heightMap[i][j] = rand.nextFloat();
+			}
+		}
+		// Random box locations
+		boxPos = new float[(rand.nextInt(11)+15)*3];
+		int i3 = 0;
+		for(int i=0; i<boxPos.length/3; i++){
+			i3 = i*3;
+			boxPos[i3] = rand.nextInt(40);
+			boxPos[i3+2] = rand.nextInt(40);
+			boxPos[i3+1] = heightMap[(int)boxPos[i3]][(int)boxPos[i3+2]];
+			boxPos[i3] -= 20;
+			boxPos[i3+2] -= 20;
+		}
 		// Load Model test
 		box = new Model("Box");
 		box.load();
@@ -70,11 +88,6 @@ public class TRPG{
 		box.yscale = 0.75f;
 		box.zscale = 0.75f;
 		box.applyScaling = true;
-		box.xpos = rand.nextInt(10)+15;
-		box.zpos = rand.nextInt(10)+15;
-		box.ypos = heightMap[(int)box.xpos][(int)box.zpos];
-		box.xpos -= 20;
-		box.zpos -= 20;
 		grass = new Model("Grass");
 		grass.load();
 		// Load Sprites
@@ -281,6 +294,11 @@ public class TRPG{
 			}
 			//*/
 
+			// Render box at it's random coords
+			for(int i=0; i<boxPos.length/3; i++){
+				box.render(boxPos[i*3], boxPos[(i*3)+1], boxPos[(i*3)+2]);
+			}
+
 			// Update positions then render loaded Box model
 			if(pos[0] >= -20f && pos[0] < 20f && pos[2] >= -20f && pos[2] < 20f){
 				//box.xpos = pos[0];
@@ -297,8 +315,8 @@ public class TRPG{
 				laharl.ypos = 0f;
 				laharl.zpos = pos[2];
 			}
-			box.render();
-			
+			//box.render()
+
 			// Sprite Test
 			laharl.render();
 			//laharl.render(0f,heightMap[20][20],0f);
@@ -411,12 +429,6 @@ public class TRPG{
 	}
 
 	public static void main(String[] argv) {
-		// Create random landscape
-		for(int i=0; i<40; i++){
-			for(int j=0; j<40; j++){
-				heightMap[i][j] = rand.nextFloat();
-			}
-		}
 		// Start test
 		TRPG engine = new TRPG();
 		engine.start();
