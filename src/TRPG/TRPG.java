@@ -37,10 +37,19 @@ public class TRPG{
 	private static Random rand = new Random();
 	private static Texture tex_grass;
 	private static Texture tex_grassside;
-	private static Texture tex_crate;
 	private static Model box;
 	
 	private static float[][] heightMap = new float[40][40];
+
+	// Ascii table to ensure consistency accross platforms
+	public static final char[] ASCII = {
+		' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?',
+		'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+		'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
+		'`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'h', 'j', 'k', 'l', 'm', 'm', 'o',
+		'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'
+	};
 
 	// Cube data from example 2-16
    private static final float[][] vertices = {
@@ -83,23 +92,7 @@ public class TRPG{
 		{3, 0, 1, 2},
 		{2, 3, 0, 1}
 	};
-	private static void modelCrate(float size, float xpos, float ypos, float zpos){
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex_crate.getTextureID());
-		GL11.glBegin(GL11.GL_QUADS);
-		// Draw all six sides of the cube.
-		for (int i = 0; i < 6; i++) {
-			// Draw all four vertices of the current side.
-			for (int m = 0; m < 4; m++) {
-				float[] temp = vertices[indices[i][m]];
-				float[] temp2 = tex[texIndex[i][m]];
-				GL11.glNormal3f(normals[i][0], normals[i][1], normals[i][2]);
-				GL11.glTexCoord2f(temp2[0], temp2[1]);
-				GL11.glVertex3f((temp[0] * size)+xpos, (temp[1] * size)+ypos, (temp[2] * size)+zpos);
-			}
-		}
-		GL11.glEnd();
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-	}
+
 	private static void terrainBlock(float xpos, float zpos, float height){
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex_grassside.getTextureID());
 		GL11.glBegin(GL11.GL_QUADS);
@@ -141,7 +134,6 @@ public class TRPG{
 		try {
 			tex_grass = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/grass16.png"));
 			tex_grassside = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/grassside16.png"));
-			tex_crate = TextureLoader.getTexture("PNG", new FileInputStream("assets/images/crate16.png"));
 		} catch (IOException ex) {
 			System.out.println("Failed to load texture");
 			return;
@@ -369,12 +361,10 @@ public class TRPG{
 			floatBuffer.flip();
 			GL11.glMaterial(GL11.GL_FRONT, GL11.GL_AMBIENT_AND_DIFFUSE, floatBuffer);//*/
 			if(pos[0] >= -20f && pos[0] < 20f && pos[2] >= -20f && pos[2] < 20f){
-				//modelCrate(1f, pos[0], heightMap[(int)pos[0]+20][(int)pos[2]+20], pos[2]);
 				box.xpos = pos[0];
 				box.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
 				box.zpos = pos[2];
 			}else{
-				//modelCrate(1f, pos[0], 0f, pos[2]);
 				box.xpos = pos[0];
 				box.ypos = 0f;
 				box.zpos = pos[2];
