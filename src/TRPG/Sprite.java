@@ -57,7 +57,7 @@ public class Sprite{
 			}
 			// File input
 			FileInputStream textureFile = new FileInputStream(sprite.file);
-			sprite.texture = TextureLoader.getTexture("PNG", textureFile);
+			sprite.texture = TextureLoader.getTexture("PNG", textureFile, GL11.GL_LINEAR);
 			textureFile.close();
 			// Everything went better than expected
 			return true;

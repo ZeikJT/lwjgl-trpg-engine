@@ -1,5 +1,6 @@
 package TRPG;
 
+import TRPG.Billboard;
 import TRPG.Model;
 import TRPG.Sprite;
 
@@ -24,6 +25,7 @@ public class TRPG{
 	private static double vang = 45d;
 	private static double tang = 45d;
 	private static double dang = 0d;
+	public static int camDir = 0;
 	private static float vpos[] = new float[] {0f,0f,0f};
 	private static float dpos = 0f;
 	private static double degToRad = Math.PI/180d;
@@ -38,8 +40,11 @@ public class TRPG{
 	private static Random rand = new Random();
 	private static Model box;
 	private static Model grass;
-	private static Sprite laharl;
+	private static Sprite arrow;
+	private static Billboard laharl;
 	private static float[] boxPos;
+	public static float[] rightMod;
+	public static float[] upMod;
 
 	private static float[][] heightMap = new float[40][40];
 
@@ -64,6 +69,11 @@ public class TRPG{
 			e.printStackTrace();
 			System.exit(0);
 		}
+		// Initialize static right and up vector variables
+		FloatBuffer mmBuffer = BufferUtils.createFloatBuffer(16);
+		rightMod = new float[3];
+		upMod = new float[3];
+
 		// Create random landscape
 		for(int i=0; i<40; i++){
 			for(int j=0; j<40; j++){
@@ -90,9 +100,17 @@ public class TRPG{
 		box.applyScaling = true;
 		grass = new Model("Grass");
 		grass.load();
-		// Load Sprites
-		laharl = new Sprite("Laharl");
+		// Load Sprite
+		arrow = new Sprite("Arrow");
+		arrow.load();
+		arrow.scale = 25f;
+		arrow.applyScaling = true;
+		// Load Billboard
+		laharl = new Billboard("Laharl");
 		laharl.load();
+		laharl.tR = 0.5f;
+		laharl.xscale = 0.5f;
+		laharl.applyScaling = true;
 
 		// init OpenGL
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -134,7 +152,7 @@ public class TRPG{
 			// Draw Background Quad
 			GL11.glBegin(GL11.GL_QUADS);
 			GL11.glColor3f(0f,0f,0f);
-			GL11.glNormal3f(0f,0f,0f);
+			GL11.glNormal3f(0f,1f,0f);
 			GL11.glVertex3f(-13f,10f,0f);
 			GL11.glNormal3f(0f,1f,0f);
 			GL11.glVertex3f(13f,10f,0f);
@@ -251,6 +269,16 @@ public class TRPG{
 					dang /= 6d;
 				}
 				vang += dang;
+				// Set camera facing direction
+				if(vang > 90d && vang <= 180d){
+					camDir = 1;
+				}else if(vang > 180d && vang <= 270d){
+					camDir = 2;
+				}else if((vang > 270d && vang <= 360) || (vang > -90d && vang <= 0d)){
+					camDir = 3;
+				}else{
+					camDir = 0;
+				}
 			}else{
 				if(vang < 0d){
 					vang += 360d;
@@ -270,6 +298,15 @@ public class TRPG{
 			GL11.glRotatef(30f, 1f, 0f, 0f);
 			GL11.glRotatef((float)vang, 0f, 1f, 0f);
 			GL11.glTranslatef(-vpos[0], -vpos[1], -vpos[2]);
+			// Update up and right vectors
+			GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX , mmBuffer);
+			rightMod[0] = mmBuffer.get(0);
+			upMod[0] = mmBuffer.get(1);
+			rightMod[1] = mmBuffer.get(4);
+			upMod[1] = mmBuffer.get(5);
+			rightMod[2] = mmBuffer.get(8);
+			upMod[2] = mmBuffer.get(9);
+			mmBuffer.clear();
 
 			//* Refresh light
 			floatArray[0] = 0f;
@@ -297,6 +334,8 @@ public class TRPG{
 			// Render box at it's random coords
 			for(int i=0; i<boxPos.length/3; i++){
 				box.render(boxPos[i*3], boxPos[(i*3)+1], boxPos[(i*3)+2]);
+				// Render arrows pointing at boxes;
+				arrow.render(boxPos[i*3], boxPos[(i*3)+1]+0.4f, boxPos[(i*3)+2]);
 			}
 
 			// Update positions then render loaded Box model
@@ -318,6 +357,8 @@ public class TRPG{
 			//box.render()
 
 			// Sprite Test
+			// Adjust for center of image
+			laharl.ypos += 1f;
 			laharl.render();
 			//laharl.render(0f,heightMap[20][20],0f);
 
