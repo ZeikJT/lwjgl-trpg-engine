@@ -5,12 +5,22 @@ The Enter button toggles an XYZ axis
 
 The code is ugly, but it's all in good fun and I'm learning a lot.
 
+Version 1.4
+------------
+ + Billboard and Point Sprite classes consolidated to Sprite
+ + Sprite class and Model class now re-use resources if possible
+ + Sprites are now depth sorted
+   Possibly over-intensive sorting algorithm
+ + Camera workings fixed up to allow for easier depth sorting
+ * Map loading planned as next feature
+ * Sprite Sheet is also planned
+
 Version 1.3
 ------------
  + Billboard sprite class added.
    These sprites can be scaled on independant axes.
    They can also be part of a sprite sheet with texture mapping.
- ? I found out that depth sorting is particularly important for
+ * I found out that depth sorting is particularly important for
    transparent textures. Need to fix this ASAP.
 
 Version 1.2
