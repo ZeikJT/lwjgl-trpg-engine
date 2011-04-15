@@ -1,6 +1,5 @@
 package TRPG;
 
-import TRPG.Billboard;
 import TRPG.Model;
 import TRPG.Sprite;
 
@@ -8,6 +7,8 @@ import java.lang.Math;
 import java.nio.FloatBuffer;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
@@ -23,7 +24,7 @@ public class TRPG{
 	private static float pos[] = new float[] {0f,0f,0f};
 	private static int moveCoolDown = 0;
 	private static double vang = 45d;
-	private static double tang = 45d;
+	private static double tang = TRPG.vang;
 	private static double dang = 0d;
 	public static int camDir = 0;
 	private static float vpos[] = new float[] {0f,0f,0f};
@@ -38,13 +39,14 @@ public class TRPG{
 	private static boolean axes = false;
 	public static boolean lights = false;
 	private static Random rand = new Random();
-	private static Model box;
-	private static Model grass;
-	private static Sprite arrow;
-	private static Billboard laharl;
-	private static float[] boxPos;
+	private static ArrayList<Model> models = new ArrayList<Model>();
+	private static Model lastModel;
+	private static ArrayList<Sprite> sprites = new ArrayList<Sprite>();
+	private static Sprite lastSprite;
+	private static Sprite laharl;
 	public static float[] rightMod;
 	public static float[] upMod;
+	private static boolean camChange = true;
 
 	private static float[][] heightMap = new float[40][40];
 
@@ -78,51 +80,51 @@ public class TRPG{
 		for(int i=0; i<40; i++){
 			for(int j=0; j<40; j++){
 				heightMap[i][j] = rand.nextFloat();
+				lastModel = new Model("Grass");
+				lastModel.xpos = i;
+				lastModel.zpos = j;
+				lastModel.yscale = heightMap[i][j];
+				lastModel.applyScaling = true;
+				models.add(lastModel);
 			}
 		}
 		// Random box locations
-		boxPos = new float[(rand.nextInt(11)+15)*3];
-		int i3 = 0;
-		for(int i=0; i<boxPos.length/3; i++){
-			i3 = i*3;
-			boxPos[i3] = rand.nextInt(40);
-			boxPos[i3+2] = rand.nextInt(40);
-			boxPos[i3+1] = heightMap[(int)boxPos[i3]][(int)boxPos[i3+2]];
-			boxPos[i3] -= 20;
-			boxPos[i3+2] -= 20;
+		for(int i=0; i<15; i++){
+			lastModel = new Model("Box");
+			lastModel.xscale = 0.75f;
+			lastModel.yscale = 0.75f;
+			lastModel.zscale = 0.75f;
+			lastModel.applyScaling = true;
+			lastModel.xpos = rand.nextInt(40);
+			lastModel.zpos = rand.nextInt(40);
+			lastModel.ypos = heightMap[(int)lastModel.xpos][(int)lastModel.zpos];
+			models.add(lastModel);
+			// Load Point Sprite
+			lastSprite = new Sprite("Arrow", true);
+			lastSprite.xpos = lastModel.xpos;
+			lastSprite.ypos = lastModel.ypos+1.2f;
+			lastSprite.zpos = lastModel.zpos;
+			lastSprite.scale = 25f;
+			lastSprite.applyScaling = true;
+			sprites.add(lastSprite);
 		}
-		// Load Model test
-		box = new Model("Box");
-		box.load();
-		box.xscale = 0.75f;
-		box.yscale = 0.75f;
-		box.zscale = 0.75f;
-		box.applyScaling = true;
-		grass = new Model("Grass");
-		grass.load();
-		// Load Sprite
-		arrow = new Sprite("Arrow");
-		arrow.load();
-		arrow.scale = 25f;
-		arrow.applyScaling = true;
-		// Load Billboard
-		laharl = new Billboard("Laharl");
-		laharl.load();
+		// Load Billboard Sprite
+		laharl = new Sprite("Laharl");
 		laharl.tR = 0.5f;
 		laharl.xscale = 0.5f;
+		//laharl.yscale = 2f;
 		laharl.applyScaling = true;
+		sprites.add(laharl);
 
 		// init OpenGL
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
 		GL11.glLoadIdentity();
-		//GL11.glOrtho(1, 800, 800, 0, 800, -800);
-		//GLU.gluLookAt(0.5774f,0.5774f,0.5774f,0f,0f,0f,0f,1f,0f);
 		GL11.glOrtho(-13f, 13f, -10f, 10f, -30f, 100f);
 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		GL11.glLoadIdentity();
-		//GL11.glScalef( 1f, 1f, -1f);
+		GL11.glRotatef(30f, 1f, 0f, 0f);
+		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
-
 		// Render in visual order
 		GL11.glFrontFace(GL11.GL_CCW);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -145,121 +147,109 @@ public class TRPG{
 			// Clear the screen and depth buffer
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-			// Check for lights, disable if necessary
-			if(lights){
-				GL11.glDisable(GL11.GL_LIGHTING);
-			}
-			// Draw Background Quad
-			GL11.glBegin(GL11.GL_QUADS);
-			GL11.glColor3f(0f,0f,0f);
-			GL11.glNormal3f(0f,1f,0f);
-			GL11.glVertex3f(-13f,10f,0f);
-			GL11.glNormal3f(0f,1f,0f);
-			GL11.glVertex3f(13f,10f,0f);
-			GL11.glColor3f(0.5f,1f,0.5f);
-			GL11.glNormal3f(0f,1f,0f);
-			GL11.glVertex3f(13f,-10f,0f);
-			GL11.glNormal3f(0f,1f,0f);
-			GL11.glVertex3f(-13f,-10f,0f);
-			GL11.glEnd();
-			// Restore lights if necessary
-			if(lights){
-				GL11.glEnable(GL11.GL_LIGHTING);
-			}
-
-			// Reset depth bit
-			GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-			// set the color of the quad (R,G,B) - A assumed to be 1f
-			GL11.glColor3f(1f,1f,1f);
-
 			pollInput();
 			//* Move one step per button press, relative to facing direction
 			if(moveCoolDown > 0){
 				moveCoolDown -= 1;
 			}else{
 				if(wDown && !sDown){
-					if(tang == 45d || tang == 405d){
-						pos[2] -= 1f;
-					}else if(tang == 135d){
-						pos[0] += 1f;
-					}else if(tang == 225d){
-						pos[2] += 1f;
-					}else{
+					if(camDir == 0){
 						pos[0] -= 1f;
+					}else if(camDir == 1){
+						pos[2] += 1f;
+					}else if(camDir == 2){
+						pos[0] += 1f;
+					}else{
+						pos[2] -= 1f;
 					}
 					moveCoolDown = 10;
+					camChange = true;
 				}else if(sDown && !wDown){
-					if(tang == 45d || tang == 405d){
-						pos[2] += 1f;
-					}else if(tang == 135d){
-						pos[0] -= 1f;
-					}else if(tang == 225d){
-						pos[2] -= 1f;
-					}else{
+					if(camDir == 0){
 						pos[0] += 1f;
+					}else if(camDir == 1){
+						pos[2] -= 1f;
+					}else if(camDir == 2){
+						pos[0] -= 1f;
+					}else{
+						pos[2] += 1f;
 					}
 					moveCoolDown = 10;
+					camChange = true;
 				}
 				if(aDown && !dDown){
-					if(tang == 45d || tang == 405d){
-						pos[0] -= 1f;
-					}else if(tang == 135d){
-						pos[2] -= 1f;
-					}else if(tang == 225d){
-						pos[0] += 1f;
-					}else{
+					if(camDir == 0){
 						pos[2] += 1f;
+					}else if(camDir == 1){
+						pos[0] += 1f;
+					}else if(camDir == 2){
+						pos[2] -= 1f;
+					}else{
+						pos[0] -= 1f;
 					}
 					moveCoolDown = 10;
+					camChange = true;
 				}else if(dDown && !aDown){
-					if(tang == 45d || tang == 405d){
-						pos[0] += 1f;
-					}else if(tang == 135d){
-						pos[2] += 1f;
-					}else if(tang == 225d){
-						pos[0] -= 1f;
-					}else{
+					if(camDir == 0){
 						pos[2] -= 1f;
+					}else if(camDir == 1){
+						pos[0] -= 1f;
+					}else if(camDir == 2){
+						pos[2] += 1f;
+					}else{
+						pos[0] += 1f;
 					}
 					moveCoolDown = 10;
+					camChange = true;
 				}
 			}
-
 			//* Camera XZ position
 			dpos = pos[0] - vpos[0];
 			if(dpos >= 0.1f){
 				vpos[0] += 0.1f;
+				camChange = true;
 			}else if(dpos <= -0.1f){
 				vpos[0] -= 0.1f;
-			}else{
+				camChange = true;
+			}else if(dpos != 0f){
 				vpos[0] = pos[0];
+				camChange = true;
 			}
 			dpos = pos[2] - vpos[2];
 			if(dpos >= 0.1f){
 				vpos[2] += 0.1f;
+				camChange = true;
 			}else if(dpos <= -0.1f){
 				vpos[2] -= 0.1f;
-			}else{
+				camChange = true;
+			}else if(dpos != 0f){
 				vpos[2] = pos[2];
+				camChange = true;
 			}//*/
 			//* Camera Y position
-			if(pos[0] >= -20f && pos[0] < 20f && pos[2] >= -20f && pos[2] < 20f){
-				dpos = heightMap[(int)pos[0]+20][(int)pos[2]+20] - vpos[1];
-				if(dpos >= 0.1){
+			if(pos[0] >= 0f && pos[0] < 40f && pos[2] >= 0f && pos[2] < 40f){
+				dpos = heightMap[(int)pos[0]][(int)pos[2]] - vpos[1];
+				if(dpos >= 0.1f){
 					vpos[1] += 0.1f;
+					camChange = true;
 				}else if(dpos <= -0.1f){
 					vpos[1] -= 0.1f;
-				}else{
-					vpos[1] = heightMap[(int)pos[0]+20][(int)pos[2]+20];
+					camChange = true;
+				}else if(dpos != 0f){
+					vpos[1] = heightMap[(int)pos[0]][(int)pos[2]];
+					camChange = true;
 				}
 			}else{
 				dpos = 0f - vpos[1];
-				if(dpos >= 0.1){
+				if(dpos >= 0.1f){
 					vpos[1] += 0.1f;
+					camChange = true;
 				}else if(dpos <= -0.1f){
 					vpos[1] -= 0.1f;
-				}else{
+					camChange = true;
+				}else if(dpos != 0f){
 					vpos[1] = 0f;
+					camChange = true;
 				}
 			}//*/
 			// Camera rotation
@@ -270,43 +260,72 @@ public class TRPG{
 				}
 				vang += dang;
 				// Set camera facing direction
-				if(vang > 90d && vang <= 180d){
+				if(vang >= 0d && vang < 90d){
+					camDir = 0;
+				}else if(vang >= 90d && vang < 180d){
 					camDir = 1;
-				}else if(vang > 180d && vang <= 270d){
+				}else if(vang >= 180d && vang < 270d){
 					camDir = 2;
-				}else if((vang > 270d && vang <= 360) || (vang > -90d && vang <= 0d)){
+				}else if(vang >= 270d && vang < 360d){
 					camDir = 3;
+				}else if(vang > -90d && vang < 0d){
+					camDir = 3;
+					vang += 360d;
+					tang += 360d;
 				}else{
 					camDir = 0;
-				}
-			}else{
-				if(vang < 0d){
-					vang += 360d;
-					tang = vang;
-				}else if(vang >= 360d){
 					vang -= 360d;
-					tang = vang;
+					tang -= 360d;
 				}
+				camChange = true;
+			}else{
 				if(qDown && !eDown){
-					tang += 90d;
-				}else if(eDown && !qDown){
 					tang -= 90d;
+				}else if(eDown && !qDown){
+					tang += 90d;
 				}
 			}
-			// Update rotation and position matrix
-			GL11.glPushMatrix();
-			GL11.glRotatef(30f, 1f, 0f, 0f);
-			GL11.glRotatef((float)vang, 0f, 1f, 0f);
-			GL11.glTranslatef(-vpos[0], -vpos[1], -vpos[2]);
-			// Update up and right vectors
-			GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX , mmBuffer);
-			rightMod[0] = mmBuffer.get(0);
-			upMod[0] = mmBuffer.get(1);
-			rightMod[1] = mmBuffer.get(4);
-			upMod[1] = mmBuffer.get(5);
-			rightMod[2] = mmBuffer.get(8);
-			upMod[2] = mmBuffer.get(9);
-			mmBuffer.clear();
+			if(camChange){
+				// Pop/Push matrix for a reset edit
+				GL11.glPopMatrix();
+				GL11.glPushMatrix();
+				// Update rotation and position matrix
+				GL11.glRotatef(-(float)vang, 0f, 1f, 0f);
+				GL11.glTranslatef(-vpos[0], -vpos[1], -vpos[2]);
+				// Update up and right vectors
+				GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX , mmBuffer);
+				rightMod[0] = mmBuffer.get(0);
+				upMod[0] = mmBuffer.get(1);
+				rightMod[1] = mmBuffer.get(4);
+				upMod[1] = mmBuffer.get(5);
+				rightMod[2] = mmBuffer.get(8);
+				upMod[2] = mmBuffer.get(9);
+				mmBuffer.clear();
+				camChange = false;
+				sortSprites();
+			}
+
+			// Draw Background Quad
+			// Check for lights, disable if necessary
+			if(lights){
+				GL11.glDisable(GL11.GL_LIGHTING);
+			}
+			GL11.glBegin(GL11.GL_QUADS);
+			GL11.glColor3f(0.5f,1f,0.5f);
+			GL11.glVertex3f(vpos[0]-((TRPG.rightMod[0] * 13f) + (TRPG.upMod[0] * 10f)),vpos[1]-((TRPG.rightMod[1] * 13f) + (TRPG.upMod[1] * 10f)),vpos[2]-((TRPG.rightMod[2] * 13f) + (TRPG.upMod[2] * 10f)));
+			GL11.glVertex3f(vpos[0]+(TRPG.rightMod[0] * 13f) - (TRPG.upMod[0] * 10f),vpos[1]+(TRPG.rightMod[1] * 13f) - (TRPG.upMod[1] * 10f),vpos[2]+(TRPG.rightMod[2] * 13f) - (TRPG.upMod[2] * 10f));
+			GL11.glColor3f(0f,0f,0f);
+			GL11.glVertex3f(vpos[0]+(TRPG.rightMod[0] * 13f) + (TRPG.upMod[0] * 10f),vpos[1]+(TRPG.rightMod[1] * 13f) + (TRPG.upMod[1] * 10f),vpos[2]+(TRPG.rightMod[2] * 13f) + (TRPG.upMod[2] * 10f));
+			GL11.glVertex3f(vpos[0]-((TRPG.rightMod[0] * 13f) - (TRPG.upMod[0] * 10f)),vpos[1]-((TRPG.rightMod[1] * 13f) - (TRPG.upMod[1] * 10f)),vpos[2]-((TRPG.rightMod[2] * 13f) - (TRPG.upMod[2] * 10f)));
+			GL11.glEnd();
+			// Restore lights if necessary
+			if(lights){
+				GL11.glEnable(GL11.GL_LIGHTING);
+			}
+			GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+
+			// set the color of the quad (R,G,B) - Alpha assumed to be 1f
+			GL11.glColor3f(1f,1f,1f);
 
 			//* Refresh light
 			floatArray[0] = 0f;
@@ -319,48 +338,30 @@ public class TRPG{
 			GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, floatBuffer);
 			//*/
 
-			//* Draw Landscape
-			grass.applyScaling = true;
-			for(int j=0; j<40; j++){
-				for(int i=0; i<40; i++){
-					grass.xpos = j-20;
-					grass.zpos = i-20;
-					grass.yscale = heightMap[j][i];
-					grass.render();
-				}
-			}
-			//*/
-
-			// Render box at it's random coords
-			for(int i=0; i<boxPos.length/3; i++){
-				box.render(boxPos[i*3], boxPos[(i*3)+1], boxPos[(i*3)+2]);
-				// Render arrows pointing at boxes;
-				arrow.render(boxPos[i*3], boxPos[(i*3)+1]+0.4f, boxPos[(i*3)+2]);
-			}
-
 			// Update positions then render loaded Box model
-			if(pos[0] >= -20f && pos[0] < 20f && pos[2] >= -20f && pos[2] < 20f){
-				//box.xpos = pos[0];
-				//box.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
-				//box.zpos = pos[2];
+			if(pos[0] >= 0f && pos[0] < 40f && pos[2] >= 0f && pos[2] < 40f){
 				laharl.xpos = pos[0];
-				laharl.ypos = heightMap[(int)pos[0]+20][(int)pos[2]+20];
+				laharl.ypos = heightMap[(int)pos[0]][(int)pos[2]];
 				laharl.zpos = pos[2];
 			}else{
-				//box.xpos = pos[0];
-				//box.ypos = 0f;
-				//box.zpos = pos[2];
 				laharl.xpos = pos[0];
 				laharl.ypos = 0f;
 				laharl.zpos = pos[2];
 			}
-			//box.render()
-
-			// Sprite Test
 			// Adjust for center of image
 			laharl.ypos += 1f;
-			laharl.render();
-			//laharl.render(0f,heightMap[20][20],0f);
+
+			// Render all Models
+			for(int m=0; m<models.size(); m++){
+				models.get(m).render();
+			}
+
+			// Render all sprites
+			GL11.glDepthMask(false);
+			for(int m=0; m<sprites.size(); m++){
+				sprites.get(m).render();
+			}
+			GL11.glDepthMask(true);
 
 			// Axes
 			if(axes){
@@ -371,19 +372,6 @@ public class TRPG{
 					GL11.glDisable(GL11.GL_LIGHTING);
 				}
 				GL11.glBegin(GL11.GL_LINES);
-				/* Static position
-				GL11.glColor3f(1f, 0f, 0f);
-				GL11.glVertex3f(0f, 0f, 0f);
-				GL11.glVertex3f(2f, 0f, 0f);
-
-				GL11.glColor3f(0f, 1f, 0f);
-				GL11.glVertex3f(0f, 0f, 0f);
-				GL11.glVertex3f(0f, 2f, 0f);
-
-				GL11.glColor3f(0f, 0f, 1f);
-				GL11.glVertex3f(0f, 0f, 0f);
-				GL11.glVertex3f(0f, 0f, 2f);
-				//*/
 				//* Moves with camera
 				GL11.glColor3f(1f, 0f, 0f);
 				GL11.glVertex3f(vpos[0], vpos[1], vpos[2]);
@@ -403,9 +391,6 @@ public class TRPG{
 					GL11.glEnable(GL11.GL_LIGHTING);
 				}
 			}
-
-			// Pop matrix
-			GL11.glPopMatrix();
 
 			Display.update();
 		}
@@ -467,6 +452,14 @@ public class TRPG{
 				}
 			}
 		}
+	}
+
+	public static void sortSprites(){
+		// Update depth index and sort sprites
+		for(int m=0; m<sprites.size(); m++){
+			sprites.get(m).updateDepthIndex();
+		}
+		Collections.sort(sprites);
 	}
 
 	public static void main(String[] argv) {
