@@ -49,7 +49,7 @@ public class ModelData{
 	public void load(){
 		try{
 			if(!this.file.exists()){
-				System.out.println("ERROR: " + this.file.toString() + " could not be loaded.");
+				System.out.println("ERROR: " + this.file.toString() + " could not be found.");
 				return;
 			}
 			//System.out.println("Loading Model: " + this.file.toString());
@@ -83,7 +83,7 @@ public class ModelData{
 					textureName = "";
 					// Fetch string length
 					charCount = (short)dbFile.readByte();
-					byteSize += 1l + charCount;
+					byteSize += 3l + charCount;
 					// Fetch characters
 					while(charCount>0){
 						textureName += TRPG.ASCII[dbFile.readByte()-32];
@@ -110,7 +110,7 @@ public class ModelData{
 				byteSize += this.totalQuadCount*32l;
 			}
 			// Check for correct file size
-			if(byteSize == this.file.length()){
+			if(byteSize != this.file.length()){
 				System.out.println(this.file.toString() + " is the wrong size. " + byteSize + " bytes expected.");
 			}
 			// Allocate array space
