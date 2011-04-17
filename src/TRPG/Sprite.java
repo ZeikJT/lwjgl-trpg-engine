@@ -17,7 +17,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 public class Sprite implements Comparable<Sprite>{
 	private String name;
 	private File file;
-	private Texture texture;
+	public Texture texture;
 	private static WeakHashMap<String,Texture> textures = new WeakHashMap<String,Texture>();
 	public float xpos = 0f;
 	public float ypos = 0f;
@@ -28,8 +28,8 @@ public class Sprite implements Comparable<Sprite>{
 	public float xscale = 1f;
 	public float yscale = 1f;
 	public float tL = 0f;
-	public float tR = 1f;
 	public float tT = 0f;
+	public float tR = 1f;
 	public float tB = 1f;
 	/* Old vars for billboard origin at bottom center
 	private static float right0;
@@ -101,7 +101,7 @@ public class Sprite implements Comparable<Sprite>{
 		}
 	}
 
-	public void load(){
+	private void load(){
 		try{
 			// Check for sprite existance
 			this.texture = (Texture)Sprite.textures.get(this.name);

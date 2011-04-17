@@ -2,6 +2,7 @@ package TRPG;
 
 import TRPG.Model;
 import TRPG.Sprite;
+import TRPG.SpriteSheet;
 
 import java.lang.Math;
 import java.nio.FloatBuffer;
@@ -43,7 +44,7 @@ public class TRPG{
 	private static Model lastModel;
 	private static ArrayList<Sprite> sprites = new ArrayList<Sprite>();
 	private static Sprite lastSprite;
-	private static Sprite laharl;
+	private static SpriteSheet laharl;
 	public static float[] rightMod;
 	public static float[] upMod;
 	private static boolean camChange = true;
@@ -108,12 +109,8 @@ public class TRPG{
 			lastSprite.applyScaling = true;
 			sprites.add(lastSprite);
 		}
-		// Load Billboard Sprite
-		laharl = new Sprite("Laharl");
-		laharl.tR = 0.5f;
-		laharl.xscale = 0.5f;
-		//laharl.yscale = 2f;
-		laharl.applyScaling = true;
+		// Load Billboard SpriteSheet
+		laharl = new SpriteSheet("Laharl");
 		sprites.add(laharl);
 
 		// init OpenGL
@@ -262,18 +259,24 @@ public class TRPG{
 				// Set camera facing direction
 				if(vang >= 0d && vang < 90d){
 					camDir = 0;
+					laharl.setIndex(0);
 				}else if(vang >= 90d && vang < 180d){
 					camDir = 1;
+					laharl.setIndex(1);
 				}else if(vang >= 180d && vang < 270d){
 					camDir = 2;
+					laharl.setIndex(3);
 				}else if(vang >= 270d && vang < 360d){
 					camDir = 3;
+					laharl.setIndex(2);
 				}else if(vang > -90d && vang < 0d){
 					camDir = 3;
+					laharl.setIndex(2);
 					vang += 360d;
 					tang += 360d;
 				}else{
 					camDir = 0;
+					laharl.setIndex(0);
 					vang -= 360d;
 					tang -= 360d;
 				}

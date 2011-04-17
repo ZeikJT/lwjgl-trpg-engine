@@ -5,6 +5,11 @@ The Enter button toggles an XYZ axis
 
 The code is ugly, but it's all in good fun and I'm learning a lot.
 
+Version 1.41
+------------
+ + SpriteSheet class added, extends Sprite
+ + Cursor sprite updated to rotate based on camera
+
 Version 1.4
 ------------
  + Billboard and Point Sprite classes consolidated to Sprite
