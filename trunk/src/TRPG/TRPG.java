@@ -40,6 +40,8 @@ public class TRPG{
 	private static boolean axes = false;
 	public static boolean lights = false;
 	private static Random rand = new Random();
+	private static int worldWidth = rand.nextInt(40) + 10;
+	private static int worldHeight = rand.nextInt(40) + 10;
 	private static ArrayList<Model> models = new ArrayList<Model>();
 	private static Model lastModel;
 	private static ArrayList<Sprite> sprites = new ArrayList<Sprite>();
@@ -49,7 +51,7 @@ public class TRPG{
 	public static float[] upMod;
 	private static boolean camChange = true;
 
-	private static float[][] heightMap = new float[40][40];
+	private static float[][] heightMap = new float[worldWidth][worldHeight];
 
 	// Ascii table to ensure consistency accross platforms
 	public static final char[] ASCII = {
@@ -78,13 +80,12 @@ public class TRPG{
 		upMod = new float[3];
 
 		// Create random landscape
-		for(int i=0; i<40; i++){
-			for(int j=0; j<40; j++){
-				heightMap[i][j] = rand.nextFloat();
+		for(int i=0; i<worldWidth; i++){
+			for(int j=0; j<worldHeight; j++){
 				lastModel = new Model("Grass");
+				lastModel.yscale = heightMap[i][j] = rand.nextFloat();
 				lastModel.xpos = i;
 				lastModel.zpos = j;
-				lastModel.yscale = heightMap[i][j];
 				lastModel.applyScaling = true;
 				models.add(lastModel);
 			}
@@ -96,8 +97,8 @@ public class TRPG{
 			lastModel.yscale = 0.75f;
 			lastModel.zscale = 0.75f;
 			lastModel.applyScaling = true;
-			lastModel.xpos = rand.nextInt(40);
-			lastModel.zpos = rand.nextInt(40);
+			lastModel.xpos = rand.nextInt(worldWidth);
+			lastModel.zpos = rand.nextInt(worldHeight);
 			lastModel.ypos = heightMap[(int)lastModel.xpos][(int)lastModel.zpos];
 			models.add(lastModel);
 			// Load Point Sprite
