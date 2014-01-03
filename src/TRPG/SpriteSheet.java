@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.WeakHashMap;
 
 public class SpriteSheet extends Sprite{
-	private String name;
 	private File file;
 	private short maxindex;
 	private float[] indexData;
@@ -20,13 +19,11 @@ public class SpriteSheet extends Sprite{
 
 	public SpriteSheet(String name){
 		super(name);
-		this.name = name;
 		this.file = new File("assets/sprites/"+this.name+".sheet");
 		this.load();
 	}
 	public SpriteSheet(String name, float xpos, float ypos, float zpos){
 		super(name,xpos,ypos,zpos);
-		this.name = name;
 		this.file = new File("assets/sprites/"+this.name+".sheet");
 		this.load();
 	}

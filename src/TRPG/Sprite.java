@@ -15,7 +15,7 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 
 public class Sprite implements Comparable<Sprite>{
-	private String name;
+	protected String name;
 	private File file;
 	public Texture texture;
 	private static WeakHashMap<String,Texture> textures = new WeakHashMap<String,Texture>();
