@@ -4,8 +4,8 @@ import TRPG.ModelData;
 
 import java.util.WeakHashMap;
 
-public class Model{
-	private static WeakHashMap<String,ModelData> models = new WeakHashMap<String,ModelData>();
+public class Model {
+	private static WeakHashMap<String, ModelData> models = new WeakHashMap<String, ModelData>();
 	private ModelData data;
 	private String name;
 	public float xpos = 0f;
@@ -16,11 +16,10 @@ public class Model{
 	public float yscale = 1f;
 	public float zscale = 1f;
 
-	public Model(String name){
-		this.name = name;
-		this.load();
+	public Model(String name) {
+		this(name, 0f, 0f, 0f);
 	}
-	public Model(String name, float xpos, float ypos, float zpos){
+	public Model(String name, float xpos, float ypos, float zpos) {
 		this.name = name;
 		this.xpos = xpos;
 		this.ypos = ypos;
@@ -28,22 +27,21 @@ public class Model{
 		this.load();
 	}
 
-	public void load(){
+	public void load() {
 		// Check if model is already loaded
-		this.data = (ModelData)Model.models.get(this.name);
-		if(this.data != null){
+		this.data = (ModelData) Model.models.get(this.name);
+		if (this.data != null) {
 			return;
 		}
 		this.data = new ModelData(this.name);
-		Model.models.put(this.name,this.data);
-		return;
+		Model.models.put(this.name, this.data);
 	}
 
-	public void render(){
+	public void render() {
 		this.data.render(this);
 	}
 
-	public void render(float xpos, float ypos, float zpos){
+	public void render(float xpos, float ypos, float zpos) {
 		this.xpos = xpos;
 		this.ypos = ypos;
 		this.zpos = zpos;
