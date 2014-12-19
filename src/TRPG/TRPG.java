@@ -51,7 +51,7 @@ public class TRPG {
 
 	// Ascii table to ensure consistency accross platforms
 	public static final char[] ASCII = {
-		' ', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ', ', '-', '.', '/',
+		' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?',
 		'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
 		'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
@@ -128,13 +128,7 @@ public class TRPG {
 		FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(4).put(floatArray);
 		floatBuffer.flip();
 		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, floatBuffer);
-		floatBuffer.clear();
-		floatBuffer.put(floatArray);
-		floatBuffer.flip();
 		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_DIFFUSE, floatBuffer);
-		floatBuffer.clear();
-		floatBuffer.put(floatArray);
-		floatBuffer.flip();
 		GL11.glLight(GL11.GL_LIGHT0, GL11.GL_SPECULAR, floatBuffer);
 		GL11.glEnable(GL11.GL_LIGHT0);
 		while (!Display.isCloseRequested()) {
@@ -222,7 +216,7 @@ public class TRPG {
 			}
 			//*/
 			//* Camera Y position
-			if (pos[0] >= 0f && pos[0] < 40f && pos[2] >= 0f && pos[2] < 40f) {
+			if (pos[0] >= 0f && pos[0] < worldWidth && pos[2] >= 0f && pos[2] < worldHeight) {
 				dpos = heightMap[(int) pos[0]][(int) pos[2]] - vpos[1];
 				if (dpos >= 0.1f) {
 					vpos[1] += 0.1f;
@@ -341,7 +335,7 @@ public class TRPG {
 			//*/
 
 			// Update positions then render loaded Box model
-			if (pos[0] >= 0f && pos[0] < 40f && pos[2] >= 0f && pos[2] < 40f) {
+			if (pos[0] >= 0f && pos[0] < worldWidth && pos[2] >= 0f && pos[2] < worldHeight) {
 				laharl.xpos = pos[0];
 				laharl.ypos = heightMap[(int) pos[0]][(int) pos[2]];
 				laharl.zpos = pos[2];
