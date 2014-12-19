@@ -335,14 +335,12 @@ public class TRPG {
 			//*/
 
 			// Update positions then render loaded Box model
+			laharl.xpos = pos[0];
+			laharl.zpos = pos[2];
 			if (pos[0] >= 0f && pos[0] < worldWidth && pos[2] >= 0f && pos[2] < worldHeight) {
-				laharl.xpos = pos[0];
 				laharl.ypos = heightMap[(int) pos[0]][(int) pos[2]];
-				laharl.zpos = pos[2];
 			} else {
-				laharl.xpos = pos[0];
 				laharl.ypos = 0f;
-				laharl.zpos = pos[2];
 			}
 			// Adjust for center of image
 			laharl.ypos += 1f;

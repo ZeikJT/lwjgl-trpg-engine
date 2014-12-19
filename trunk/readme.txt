@@ -5,6 +5,14 @@ The Enter button toggles an XYZ axis
 
 The code is ugly, but it's all in good fun and I'm learning a lot.
 
+Version 1.42
+------------
+ + Bug fixes
+ + Minor code restructure
+ + Minor optimizations
+ + Updated slick-util to latest version
+ * Contemplating moving to LWJGL v3
+
 Version 1.41
 ------------
  + SpriteSheet class added, extends Sprite
