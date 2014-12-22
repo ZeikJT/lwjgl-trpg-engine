@@ -21,7 +21,7 @@ public class TRPG {
 	private static float pos[] = new float[] {0f, 0f, 0f};
 	private static int moveCoolDown = 0;
 	private static double vang = 45d;
-	private static double tang = TRPG.vang;
+	private static double tang = vang;
 	private static double dang = 0d;
 	public static int camDir = 0;
 	private static float vpos[] = new float[] {0f, 0f, 0f};
@@ -46,7 +46,6 @@ public class TRPG {
 	public static float[] rightMod;
 	public static float[] upMod;
 	private static boolean camChange = true;
-
 	private static float[][] heightMap = new float[worldWidth][worldHeight];
 
 	// Ascii table to ensure consistency accross platforms
@@ -59,7 +58,7 @@ public class TRPG {
 		'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'
 	};
 
-	public void start() {
+	private static void start() {
 		// init Display window
 		try {
 			Display.setDisplayMode(new DisplayMode(800, 600));
@@ -308,11 +307,11 @@ public class TRPG {
 			}
 			GL11.glBegin(GL11.GL_QUADS);
 				GL11.glColor3f(0.5f, 1f, 0.5f);
-				GL11.glVertex3f(vpos[0] - ((TRPG.rightMod[0] * 13f) + (TRPG.upMod[0] * 10f)), vpos[1] - ((TRPG.rightMod[1] * 13f) + (TRPG.upMod[1] * 10f)), vpos[2] - ((TRPG.rightMod[2] * 13f) + (TRPG.upMod[2] * 10f)));
-				GL11.glVertex3f(vpos[0] + (TRPG.rightMod[0] * 13f) - (TRPG.upMod[0] * 10f), vpos[1] + (TRPG.rightMod[1] * 13f) - (TRPG.upMod[1] * 10f), vpos[2] + (TRPG.rightMod[2] * 13f) - (TRPG.upMod[2] * 10f));
+				GL11.glVertex3f(vpos[0] - ((rightMod[0] * 13f) + (upMod[0] * 10f)), vpos[1] - ((rightMod[1] * 13f) + (upMod[1] * 10f)), vpos[2] - ((rightMod[2] * 13f) + (upMod[2] * 10f)));
+				GL11.glVertex3f(vpos[0] + (rightMod[0] * 13f) - (upMod[0] * 10f), vpos[1] + (rightMod[1] * 13f) - (upMod[1] * 10f), vpos[2] + (rightMod[2] * 13f) - (upMod[2] * 10f));
 				GL11.glColor3f(0f, 0f, 0f);
-				GL11.glVertex3f(vpos[0] + (TRPG.rightMod[0] * 13f) + (TRPG.upMod[0] * 10f), vpos[1] + (TRPG.rightMod[1] * 13f) + (TRPG.upMod[1] * 10f), vpos[2] + (TRPG.rightMod[2] * 13f) + (TRPG.upMod[2] * 10f));
-				GL11.glVertex3f(vpos[0] - ((TRPG.rightMod[0] * 13f) - (TRPG.upMod[0] * 10f)), vpos[1] - ((TRPG.rightMod[1] * 13f) - (TRPG.upMod[1] * 10f)), vpos[2] - ((TRPG.rightMod[2] * 13f) - (TRPG.upMod[2] * 10f)));
+				GL11.glVertex3f(vpos[0] + (rightMod[0] * 13f) + (upMod[0] * 10f), vpos[1] + (rightMod[1] * 13f) + (upMod[1] * 10f), vpos[2] + (rightMod[2] * 13f) + (upMod[2] * 10f));
+				GL11.glVertex3f(vpos[0] - ((rightMod[0] * 13f) - (upMod[0] * 10f)), vpos[1] - ((rightMod[1] * 13f) - (upMod[1] * 10f)), vpos[2] - ((rightMod[2] * 13f) - (upMod[2] * 10f)));
 			GL11.glEnd();
 			// Restore lights if necessary
 			if (lights) {
@@ -392,7 +391,7 @@ public class TRPG {
 		Display.destroy();
 	}
 
-	public void pollInput() {
+	private static void pollInput() {
 		/* Mouse coords
 		if (Mouse.isButtonDown(0)) {
 			int x = Mouse.getX();
@@ -449,7 +448,7 @@ public class TRPG {
 		}
 	}
 
-	public static void sortSprites() {
+	private static void sortSprites() {
 		// Update depth index and sort sprites
 		for (int m = 0; m < sprites.size(); m += 1) {
 			sprites.get(m).updateDepthIndex();
@@ -459,7 +458,6 @@ public class TRPG {
 
 	public static void main(String[] argv) {
 		// Start test
-		TRPG engine = new TRPG();
-		engine.start();
+		start();
 	}
 }
