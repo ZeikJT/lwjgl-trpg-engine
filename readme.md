@@ -64,5 +64,5 @@ The code is ugly, but it's all in good fun and I'm learning a lot.
 ```
 ##### Version 1.0.0
 ```
-+ A small TRPG engine test.
++ A small TRPG engine test
 ```
