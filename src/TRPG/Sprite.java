@@ -1,5 +1,7 @@
 package TRPG;
 
+import TRPG.Main;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -82,7 +84,7 @@ public class Sprite implements Comparable<Sprite> {
 	}
 
 	public void updateDepthIndex() {
-		switch (TRPG.camDir) {
+		switch (Main.camDir) {
 			case 0:
 				this.depthIndex = this.ypos + this.xpos + this.zpos;
 				break;
@@ -178,25 +180,25 @@ public class Sprite implements Comparable<Sprite> {
 		// Calculate vertex mods to adjust for camera rotation
 		if (this.applyScaling) {
 			// Apply scaling if needed
-			right0 = TRPG.rightMod[0] * 0.5f * this.xscale;
-			right1 = TRPG.rightMod[1] * 0.5f * this.xscale;
-			right2 = TRPG.rightMod[2] * 0.5f * this.xscale;
-			rightup0p = right0 + (TRPG.upMod[0] * this.yscale);
-			rightup1p = right1 + (TRPG.upMod[1] * this.yscale);
-			rightup2p = right2 + (TRPG.upMod[2] * this.yscale);
-			rightup0n = -right0 + (TRPG.upMod[0] * this.yscale);
-			rightup1n = -right1 + (TRPG.upMod[1] * this.yscale);
-			rightup2n = -right2 + (TRPG.upMod[2] * this.yscale);
+			right0 = Main.rightMod[0] * 0.5f * this.xscale;
+			right1 = Main.rightMod[1] * 0.5f * this.xscale;
+			right2 = Main.rightMod[2] * 0.5f * this.xscale;
+			rightup0p = right0 + (Main.upMod[0] * this.yscale);
+			rightup1p = right1 + (Main.upMod[1] * this.yscale);
+			rightup2p = right2 + (Main.upMod[2] * this.yscale);
+			rightup0n = -right0 + (Main.upMod[0] * this.yscale);
+			rightup1n = -right1 + (Main.upMod[1] * this.yscale);
+			rightup2n = -right2 + (Main.upMod[2] * this.yscale);
 		} else {
-			right0 = TRPG.rightMod[0] * 0.5f;
-			right1 = TRPG.rightMod[1] * 0.5f;
-			right2 = TRPG.rightMod[2] * 0.5f;
-			rightup0p = right0 + TRPG.upMod[0];
-			rightup1p = right1 + TRPG.upMod[1];
-			rightup2p = right2 + TRPG.upMod[2];
-			rightup0n = -right0 + TRPG.upMod[0];
-			rightup1n = -right1 + TRPG.upMod[1];
-			rightup2n = -right2 + TRPG.upMod[2];
+			right0 = Main.rightMod[0] * 0.5f;
+			right1 = Main.rightMod[1] * 0.5f;
+			right2 = Main.rightMod[2] * 0.5f;
+			rightup0p = right0 + Main.upMod[0];
+			rightup1p = right1 + Main.upMod[1];
+			rightup2p = right2 + Main.upMod[2];
+			rightup0n = -right0 + Main.upMod[0];
+			rightup1n = -right1 + Main.upMod[1];
+			rightup2n = -right2 + Main.upMod[2];
 		}
 		GL11.glTexCoord2f(this.tL, this.tB);
 		GL11.glVertex3f(this.xpos - right0, this.ypos - right1, this.zpos - right2);
@@ -208,19 +210,19 @@ public class Sprite implements Comparable<Sprite> {
 		GL11.glVertex3f(this.xpos + rightup0n, this.ypos + rightup1n, this.zpos + rightup2n);
 		//*/
 		if (this.applyScaling) {
-			rightup0p = (TRPG.rightMod[0] * this.xscale) + (TRPG.upMod[0] * this.yscale);
-			rightup1p = (TRPG.rightMod[1] * this.xscale) + (TRPG.upMod[1] * this.yscale);
-			rightup2p = (TRPG.rightMod[2] * this.xscale) + (TRPG.upMod[2] * this.yscale);
-			rightup0n = (TRPG.rightMod[0] * this.xscale) - (TRPG.upMod[0] * this.yscale);
-			rightup1n = (TRPG.rightMod[1] * this.xscale) - (TRPG.upMod[1] * this.yscale);
-			rightup2n = (TRPG.rightMod[2] * this.xscale) - (TRPG.upMod[2] * this.yscale);
+			rightup0p = (Main.rightMod[0] * this.xscale) + (Main.upMod[0] * this.yscale);
+			rightup1p = (Main.rightMod[1] * this.xscale) + (Main.upMod[1] * this.yscale);
+			rightup2p = (Main.rightMod[2] * this.xscale) + (Main.upMod[2] * this.yscale);
+			rightup0n = (Main.rightMod[0] * this.xscale) - (Main.upMod[0] * this.yscale);
+			rightup1n = (Main.rightMod[1] * this.xscale) - (Main.upMod[1] * this.yscale);
+			rightup2n = (Main.rightMod[2] * this.xscale) - (Main.upMod[2] * this.yscale);
 		} else {
-			rightup0p = (TRPG.rightMod[0] + TRPG.upMod[0]);
-			rightup1p = (TRPG.rightMod[1] + TRPG.upMod[1]);
-			rightup2p = (TRPG.rightMod[2] + TRPG.upMod[2]);
-			rightup0n = (TRPG.rightMod[0] - TRPG.upMod[0]);
-			rightup1n = (TRPG.rightMod[1] - TRPG.upMod[1]);
-			rightup2n = (TRPG.rightMod[2] - TRPG.upMod[2]);
+			rightup0p = (Main.rightMod[0] + Main.upMod[0]);
+			rightup1p = (Main.rightMod[1] + Main.upMod[1]);
+			rightup2p = (Main.rightMod[2] + Main.upMod[2]);
+			rightup0n = (Main.rightMod[0] - Main.upMod[0]);
+			rightup1n = (Main.rightMod[1] - Main.upMod[1]);
+			rightup2n = (Main.rightMod[2] - Main.upMod[2]);
 		}
 		GL11.glBegin(GL11.GL_QUADS);
 			GL11.glTexCoord2f(this.tL, this.tB);
