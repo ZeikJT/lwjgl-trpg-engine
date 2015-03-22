@@ -1,5 +1,6 @@
 package TRPG;
 
+import TRPG.Main;
 import TRPG.Model;
 
 import java.io.BufferedInputStream;
@@ -73,7 +74,7 @@ public class ModelData {
 			// Header is 10 bytes up until now
 			long byteSize = 10l;
 			// Allocate variable for texture file String array
-			String textureName;
+			StringBuilder textureName;
 			// Load textures names
 			short charCount;
 			// File input
@@ -82,18 +83,18 @@ public class ModelData {
 			// Time to load texture names and quads for each piece
 			for (int p = 0; p < this.pieceCount; p += 1) {
 				if (this.hasTexture) {
-					textureName = "";
+					textureName = new StringBuilder();
 					// Fetch string length
 					charCount = (short) dbFile.readByte();
 					byteSize += 3l + charCount;
 					// Fetch characters
 					while (charCount > 0) {
-						textureName += TRPG.ASCII[dbFile.readByte() - 32];
+						textureName.append(Main.ASCII[dbFile.readByte()]);
 						charCount -= 1;
 					}
 					//System.out.println(" Loading Model Texture: assets\\models\\" + this.name + "\\" + textureName + ".png");
 					// Load the texture into memory
-					textureFile = new FileInputStream("assets/models/" + this.name + "/" + textureName + ".png");
+					textureFile = new FileInputStream("assets/models/" + this.name + "/" + textureName.toString() + ".png");
 					this.textures[p] = TextureLoader.getTexture("PNG", textureFile);
 					textureFile.close();
 				}
@@ -176,7 +177,7 @@ public class ModelData {
 		if (this.failedLoad) {
 			return;
 		}
-		if (TRPG.lights && !this.hasTexture) {
+		if (Main.lights && !this.hasTexture) {
 			GL11.glDisable(GL11.GL_LIGHTING);
 		}
 		ModelData.offset = 0l;
@@ -231,7 +232,7 @@ public class ModelData {
 		if (this.hasTexture) {
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		}
-		if (TRPG.lights && !this.hasTexture) {
+		if (Main.lights && !this.hasTexture) {
 			GL11.glEnable(GL11.GL_LIGHTING);
 		}
 	}
