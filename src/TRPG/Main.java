@@ -1,5 +1,6 @@
 package TRPG;
 
+import TRPG.KeyboardEvents;
 import TRPG.Model;
 import TRPG.Sprite;
 import TRPG.SpriteSheet;
@@ -10,14 +11,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+//import org.lwjgl.input.Mouse;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
-public class TRPG {
+import static org.lwjgl.input.Keyboard.KEY_A;
+import static org.lwjgl.input.Keyboard.KEY_D;
+import static org.lwjgl.input.Keyboard.KEY_W;
+import static org.lwjgl.input.Keyboard.KEY_S;
+import static org.lwjgl.input.Keyboard.KEY_Q;
+import static org.lwjgl.input.Keyboard.KEY_E;
+import static org.lwjgl.input.Keyboard.KEY_SPACE;
+import static org.lwjgl.input.Keyboard.KEY_RETURN;
+
+public class Main implements KeyboardEvents.Listener {
 	private static float pos[] = new float[] {0f, 0f, 0f};
 	private static int moveCoolDown = 0;
 	private static double vang = 45d;
@@ -50,15 +59,17 @@ public class TRPG {
 
 	// Ascii table to ensure consistency accross platforms
 	public static final char[] ASCII = {
-		' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?',
-		'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-		'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_',
-		'`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'h', 'j', 'k', 'l', 'm', 'm', 'o',
-		'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'
+		   0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+		   0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+		 ' ',  '!',  '"',  '#',  '$',  '%',  '&', '\'',  '(',  ')',  '*',  '+',  ',',  '-',  '.',  '/',
+		 '0',  '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8',  '9',  ':',  ';',  '<',  '=',  '>',  '?',
+		 '@',  'A',  'B',  'C',  'D',  'E',  'F',  'G',  'H',  'I',  'J',  'K',  'L',  'M',  'N',  'O',
+		 'P',  'Q',  'R',  'S',  'T',  'U',  'V',  'W',  'X',  'Y',  'Z',  '[', '\\',  ']',  '^',  '_',
+		 '`',  'a',  'b',  'c',  'd',  'e',  'f',  'g',  'h',  'i',  'j',  'k',  'l',  'm',  'n',  'o',
+		 'p',  'q',  'r',  's',  't',  'u',  'v',  'w',  'x',  'y',  'z',  '{',  '|',  '}',  '~',    0
 	};
 
-	private static void start() {
+	private Main() {
 		// init Display window
 		try {
 			Display.setDisplayMode(new DisplayMode(800, 600));
@@ -69,6 +80,13 @@ public class TRPG {
 			e.printStackTrace();
 			System.exit(0);
 		}
+
+		KeyboardEvents.listenTo(new int[]{
+			KEY_A, KEY_D, KEY_W, KEY_S,
+			KEY_Q, KEY_E,
+			KEY_SPACE, KEY_RETURN
+		}, this);
+
 		// Initialize static right and up vector variables
 		FloatBuffer mmBuffer = BufferUtils.createFloatBuffer(16);
 		rightMod = new float[3];
@@ -134,7 +152,14 @@ public class TRPG {
 			// Clear the screen and depth buffer
 			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-			pollInput();
+			/* Mouse coords
+			if (Mouse.isButtonDown(0)) {
+				int x = Mouse.getX();
+				int y = Mouse.getY();
+				System.out.println("MOUSE DOWN @ X: " + x + " Y: " + y);
+			}
+			//*/
+			KeyboardEvents.pollInput();
 			//* Move one step per button press, relative to facing direction
 			if (moveCoolDown > 0) {
 				moveCoolDown -= 1;
@@ -391,60 +416,41 @@ public class TRPG {
 		Display.destroy();
 	}
 
-	private static void pollInput() {
-		/* Mouse coords
-		if (Mouse.isButtonDown(0)) {
-			int x = Mouse.getX();
-			int y = Mouse.getY();
-			System.out.println("MOUSE DOWN @ X: " + x + " Y: " + y);
-		}
-		//*/
-		while (Keyboard.next()) {
-			int key = Keyboard.getEventKey();
-			if (Keyboard.getEventKeyState()) {
-				if (key == Keyboard.KEY_A) {
-					aDown = true;
-				} else if (key == Keyboard.KEY_D) {
-					dDown = true;
-				} else if (key == Keyboard.KEY_W) {
-					wDown = true;
-				} else if (key == Keyboard.KEY_S) {
-					sDown = true;
-				} else if (key == Keyboard.KEY_Q) {
-					qDown = true;
-				} else if (key == Keyboard.KEY_E) {
-					eDown = true;
-				} else if (key == Keyboard.KEY_SPACE) {
+	public void onKeyChange(int key, boolean state) {
+		switch (key) {
+			case KEY_A:
+				aDown = state;
+				break;
+			case KEY_D:
+				dDown = state;
+				break;
+			case KEY_W:
+				wDown = state;
+				break;
+			case KEY_S:
+				sDown = state;
+				break;
+			case KEY_Q:
+				qDown = state;
+				break;
+			case KEY_E:
+				eDown = state;
+				break;
+			case KEY_SPACE:
+				if (state) {
+					lights = !lights;
 					if (lights) {
-						GL11.glDisable(GL11.GL_LIGHTING);
-						lights = false;
-					} else {
 						GL11.glEnable(GL11.GL_LIGHTING);
-						lights = true;
-					}
-				} else if (key == Keyboard.KEY_RETURN) {
-					if (axes) {
-						axes = false;
 					} else {
-						axes = true;
+						GL11.glDisable(GL11.GL_LIGHTING);
 					}
 				}
-			} else {
-				// Handle key releases
-				if (key == Keyboard.KEY_A) {
-					aDown = false;
-				} else if (key == Keyboard.KEY_D) {
-					dDown = false;
-				} else if (key == Keyboard.KEY_W) {
-					wDown = false;
-				} else if (key == Keyboard.KEY_S) {
-					sDown = false;
-				} else if (key == Keyboard.KEY_Q) {
-					qDown = false;
-				} else if (key == Keyboard.KEY_E) {
-					eDown = false;
+				break;
+			case KEY_RETURN:
+				if (state) {
+					axes = !axes;
 				}
-			}
+				break;
 		}
 	}
 
@@ -457,7 +463,7 @@ public class TRPG {
 	}
 
 	public static void main(String[] argv) {
-		// Start test
-		start();
+		// Start
+		new Main();
 	}
 }
