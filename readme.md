@@ -7,6 +7,11 @@ The code is ugly, but it's all in good fun and I'm learning a lot.
 
 ---
 
+##### Version 1.5.1
+```
++ Better variable usage.
+```
+
 ##### Version 1.5.0
 ```
 + .gitignore now that this repo lives on git

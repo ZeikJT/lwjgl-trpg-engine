@@ -6,7 +6,7 @@ import java.util.WeakHashMap;
 
 public class Model {
 	private static WeakHashMap<String, ModelData> models = new WeakHashMap<String, ModelData>();
-	private ModelData data;
+	private ModelData modelData;
 	private String name;
 	public float xpos = 0f;
 	public float ypos = 0f;
@@ -16,35 +16,42 @@ public class Model {
 	public float yscale = 1f;
 	public float zscale = 1f;
 
-	public Model(String name) {
-		this(name, 0f, 0f, 0f);
-	}
-	public Model(String name, float xpos, float ypos, float zpos) {
-		this.name = name;
-		this.xpos = xpos;
-		this.ypos = ypos;
-		this.zpos = zpos;
-		this.load();
-	}
-
-	public void load() {
+	private static ModelData loadModelData(String name) {
 		// Check if model is already loaded
-		this.data = (ModelData) Model.models.get(this.name);
-		if (this.data != null) {
-			return;
+		ModelData modelData = Model.models.get(name);
+		if (modelData == null) {
+			modelData = new ModelData(name);
+			Model.models.put(name, modelData);
 		}
-		this.data = new ModelData(this.name);
-		Model.models.put(this.name, this.data);
+		return modelData;
 	}
 
-	public void render() {
-		this.data.render(this);
+	public Model(String name) {
+		this.modelData = loadModelData(name);
+		this.name = name;
 	}
 
-	public void render(float xpos, float ypos, float zpos) {
+	public Model position(xpos, ypos, zpos) {
 		this.xpos = xpos;
 		this.ypos = ypos;
 		this.zpos = zpos;
-		this.data.render(this);
+		return this;
+	}
+
+	public Model scale(float scale) {
+		return this.scale(scale, scale, scale);
+	}
+
+	public Model scale(float xscale, float yscale, float zscale) {
+		this.xscale = xscale;
+		this.yscale = yscale;
+		this.zscale = zscale;
+		this.applyScaling = (xscale != 1f || yscale != 1f || zscale != 1f);
+		return this;
+	}
+
+	public Model render() {
+		this.modelData.render(this);
+		return this;
 	}
 }

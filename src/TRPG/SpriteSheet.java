@@ -28,7 +28,7 @@ public class SpriteSheet extends Sprite {
 	}
 
 	public boolean setIndex(int i) {
-		if (i > maxindex) {
+		if (i >= maxindex) {
 			return false;
 		}
 		this.xscale = this.indexData[i * 6];
@@ -49,8 +49,7 @@ public class SpriteSheet extends Sprite {
 			}
 			// File input
 			DataInputStream sheetFile = new DataInputStream(new BufferedInputStream(new FileInputStream(file), 100));
-			String spr = "SPR";
-			if (!spr.equals("" + sheetFile.readChar() + sheetFile.readChar() + sheetFile.readChar())) {
+			if (!"SPR".equals("" + sheetFile.readChar() + sheetFile.readChar() + sheetFile.readChar())) {
 				System.out.println(file.toString() + " incorrect header.");
 				return false;
 			}

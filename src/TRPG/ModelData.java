@@ -47,17 +47,16 @@ public class ModelData {
 		this.failedLoad = !this.load();
 	}
 
-	public boolean load() {
-		File file = new File("assets/models/" + this.name + "/model.obj");
+	private boolean load() {
 		try {
+			File file = new File("assets/models/" + this.name + "/model.obj");
 			if (!file.exists()) {
 				System.out.println("ERROR: " + file.toString() + " could not be found.");
 				return false;
 			}
 			//System.out.println("Loading Model: " + file.toString());
 			DataInputStream dbFile = new DataInputStream(new BufferedInputStream(new FileInputStream(file), 100));
-			String obj = "OBJ";
-			if (!obj.equals("" + dbFile.readChar() + dbFile.readChar() + dbFile.readChar())) {
+			if (!"OBJ".equals("" + dbFile.readChar() + dbFile.readChar() + dbFile.readChar())) {
 				System.out.println(file.toString() + " incorrect header.");
 				return false;
 			}

@@ -48,9 +48,7 @@ public class Main implements KeyboardEvents.Listener {
 	private static int worldWidth = rand.nextInt(40) + 10;
 	private static int worldHeight = rand.nextInt(40) + 10;
 	private static ArrayList<Model> models = new ArrayList<Model>();
-	private static Model lastModel;
 	private static ArrayList<Sprite> sprites = new ArrayList<Sprite>();
-	private static Sprite lastSprite;
 	private static SpriteSheet laharl;
 	public static float[] rightMod;
 	public static float[] upMod;
@@ -95,33 +93,22 @@ public class Main implements KeyboardEvents.Listener {
 		// Create random landscape
 		for (int i = 0; i < worldWidth; i += 1) {
 			for (int j = 0; j < worldHeight; j += 1) {
-				lastModel = new Model("Grass");
-				lastModel.yscale = heightMap[i][j] = rand.nextFloat();
-				lastModel.xpos = i;
-				lastModel.zpos = j;
-				lastModel.applyScaling = true;
-				models.add(lastModel);
+				float ypos = rand.nextFloat();
+				heightMap[i][j] = ypos;
+				models.add(new Model("Grass").scale(i, ypos, j));
 			}
 		}
 		// Random box locations
 		for (int i = 0; i < 15; i += 1) {
-			lastModel = new Model("Box");
-			lastModel.xscale = 0.75f;
-			lastModel.yscale = 0.75f;
-			lastModel.zscale = 0.75f;
-			lastModel.applyScaling = true;
-			lastModel.xpos = rand.nextInt(worldWidth);
-			lastModel.zpos = rand.nextInt(worldHeight);
-			lastModel.ypos = heightMap[(int) lastModel.xpos][(int) lastModel.zpos];
-			models.add(lastModel);
+			int xpos = rand.nextInt(worldWidth);
+			int zpos = rand.nextInt(worldHeight);
+			float ypos = heightMap[xpos][zpos];
+			// Add Box
+			models.add(new Model("Box").scale(0.75f).position(xpos, ypos, zpos));
 			// Load Point Sprite
-			lastSprite = new Sprite("Arrow", true);
-			lastSprite.xpos = lastModel.xpos;
-			lastSprite.ypos = lastModel.ypos + 1.2f;
-			lastSprite.zpos = lastModel.zpos;
-			lastSprite.scale = 25f;
-			lastSprite.applyScaling = true;
-			sprites.add(lastSprite);
+			sprites.add(
+				new PointSprite("Arrow").position(xpos, ypos + 1.2f, zpos).scale(25f)
+			);
 		}
 		// Load Billboard SpriteSheet
 		laharl = new SpriteSheet("Laharl");
