@@ -31,12 +31,13 @@ public class SpriteSheet extends Sprite {
 		if (i >= maxindex) {
 			return false;
 		}
-		this.xscale = this.indexData[i * 6];
-		this.yscale = this.indexData[(i * 6) + 1];
-		this.tL = this.indexData[(i * 6) + 2] + this.xtexel;
-		this.tT = this.indexData[(i * 6) + 3] + this.ytexel;
-		this.tR = this.indexData[(i * 6) + 4] + this.xtexel;
-		this.tB = this.indexData[(i * 6) + 5] + this.ytexel;
+		int offset = i * 6;
+		this.xscale = this.indexData[offset];
+		this.yscale = this.indexData[offset + 1];
+		this.tL = this.indexData[offset + 2] + this.xtexel;
+		this.tT = this.indexData[offset + 3] + this.ytexel;
+		this.tR = this.indexData[offset + 4] + this.xtexel;
+		this.tB = this.indexData[offset + 5] + this.ytexel;
 		return true;
 	}
 
@@ -68,12 +69,13 @@ public class SpriteSheet extends Sprite {
 			}
 			indexData = new float[this.maxindex * 6];
 			for (int i = 0; i < maxindex; i += 1) {
-				indexData[i * 6] = sheetFile.readFloat();
-				indexData[(i * 6) + 1] = sheetFile.readFloat();
-				indexData[(i * 6) + 2] = sheetFile.readFloat();
-				indexData[(i * 6) + 3] = sheetFile.readFloat();
-				indexData[(i * 6) + 4] = sheetFile.readFloat();
-				indexData[(i * 6) + 5] = sheetFile.readFloat();
+				int offset = i * 6;
+				indexData[offset] = sheetFile.readFloat();
+				indexData[offset + 1] = sheetFile.readFloat();
+				indexData[offset + 2] = sheetFile.readFloat();
+				indexData[offset + 3] = sheetFile.readFloat();
+				indexData[offset + 4] = sheetFile.readFloat();
+				indexData[offset + 5] = sheetFile.readFloat();
 			}
 			this.maxindex--;
 			this.setIndex(0);
