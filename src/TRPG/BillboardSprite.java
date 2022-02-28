@@ -1,12 +1,14 @@
 package TRPG;
 
-import TRPG.Main;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 public class BillboardSprite extends Sprite {
-  @override
+  public BillboardSprite(String name) {
+    super(name);
+  }
+
+  @Override
   protected void renderInternal() {
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.texture.getTextureID());
     GL11.glEnable(GL11.GL_BLEND);

@@ -4,7 +4,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 public class PointSprite extends Sprite {
-  @override
+  public PointSprite(String name) {
+    super(name);
+  }
+
+  @Override
   protected void renderInternal() {
     GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.texture.getTextureID());
     GL11.glEnable(GL11.GL_BLEND);
@@ -12,7 +16,7 @@ public class PointSprite extends Sprite {
     GL11.glEnable(GL20.GL_POINT_SPRITE);
     GL11.glTexEnvi(GL20.GL_POINT_SPRITE, GL20.GL_COORD_REPLACE, GL11.GL_TRUE);
     if (this.applyScaling) {
-      GL11.glPointSize(this.scale);
+      GL11.glPointSize(this.xscale);
     } else {
       GL11.glPointSize(100f);
     }

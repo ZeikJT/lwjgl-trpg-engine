@@ -1,8 +1,5 @@
 package TRPG;
 
-import TRPG.Main;
-import TRPG.Model;
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;

@@ -1,7 +1,5 @@
 package TRPG;
 
-import TRPG.Main;
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -24,9 +22,7 @@ abstract public class Sprite implements Comparable<Sprite> {
 	public float xpos = 0f;
 	public float ypos = 0f;
 	public float zpos = 0f;
-	private boolean isPointSprite = false;
 	public boolean applyScaling = false;
-	public float scale = 100.0f;
 	public float xscale = 1f;
 	public float yscale = 1f;
 	public float tL = 0f;
@@ -34,16 +30,16 @@ abstract public class Sprite implements Comparable<Sprite> {
 	public float tR = 1f;
 	public float tB = 1f;
 	/* Old vars for billboard origin at bottom center
-	private static float right0;
-	private static float right1;
-	private static float right2;
+	protected static float right0;
+	protected static float right1;
+	protected static float right2;
 	//*/
-	private static float rightup0p;
-	private static float rightup0n;
-	private static float rightup1p;
-	private static float rightup1n;
-	private static float rightup2p;
-	private static float rightup2n;
+	protected static float rightup0p;
+	protected static float rightup0n;
+	protected static float rightup1p;
+	protected static float rightup1n;
+	protected static float rightup2p;
+	protected static float rightup2n;
 	private float depthIndex;
 	private static float compareIndex;
 
@@ -59,24 +55,24 @@ abstract public class Sprite implements Comparable<Sprite> {
 	}
 
 	public Sprite(String name) {
-		this(name, false, 0f, 0f, 0f);
-	}
-	public Sprite(String name, boolean isPointSprite) {
-		this(name, isPointSprite, 0f, 0f, 0f);
-	}
-	public Sprite(String name, float xpos, float ypos, float zpos) {
 		this.name = name;
-		this.xpos = xpos;
-		this.ypos = ypos;
-		this.zpos = zpos;
 		this.failedLoad = !this.load();
 	}
-
-	public void updateDepthIndex(float xpos, float ypos, float zpos) {
+	public Sprite position(float xpos, float ypos, float zpos) {
 		this.xpos = xpos;
 		this.ypos = ypos;
 		this.zpos = zpos;
 		this.updateDepthIndex();
+		return this;
+	}
+	public Sprite scale(float scale) {
+		return scale(scale, scale);
+	}
+	public Sprite scale(float xscale, float yscale) {
+		this.xscale = xscale;
+		this.yscale = yscale;
+		this.applyScaling = (xscale != 1f || yscale != 1f);
+		return this;
 	}
 
 	public void updateDepthIndex() {
@@ -96,9 +92,10 @@ abstract public class Sprite implements Comparable<Sprite> {
 		}
 	}
 
-	private boolean load() {
+	protected boolean load() {
+		String filepath = "assets/sprites/" + this.name + ".png";
 		try {
-			File file = new File("assets/sprites/" + this.name + ".png");
+			File file = new File(filepath);
 			// Check for sprite existance
 			this.texture = (Texture) Sprite.textures.get(this.name);
 			if (this.texture != null) {
@@ -115,13 +112,13 @@ abstract public class Sprite implements Comparable<Sprite> {
 			// Store in hashmap
 			Sprite.textures.put(this.name, this.texture);
 		} catch (EOFException error) {
-			System.out.println("ERROR: EOF reached while processing" + file.toString());
+			System.out.println("ERROR: EOF reached while processing" + filepath);
 			return false;
 		} catch (FileNotFoundException error) {
-			System.out.println("ERROR: File could not be found while processing " + file.toString());
+			System.out.println("ERROR: File could not be found while processing " + filepath);
 			return false;
 		} catch (IOException error) {
-			System.out.println("ERROR: While processing " + file.toString());
+			System.out.println("ERROR: While processing " + filepath);
 			return false;
 		}
 

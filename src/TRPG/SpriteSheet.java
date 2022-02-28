@@ -1,7 +1,5 @@
 package TRPG;
 
-import TRPG.Sprite;
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -10,21 +8,14 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.File;
 
-public class SpriteSheet extends Sprite {
+public class SpriteSheet extends BillboardSprite {
 	private short maxindex;
 	private float[] indexData;
 	private float xtexel;
 	private float ytexel;
 
 	public SpriteSheet(String name) {
-		this(name, 0f, 0f, 0f);
-	}
-
-	public SpriteSheet(String name, float xpos, float ypos, float zpos) {
-		super(name, xpos, ypos, zpos);
-		if (!this.failedLoad) {
-			this.failedLoad = !this.load();
-		}
+		super(name);
 	}
 
 	public boolean setIndex(int i) {
@@ -41,9 +32,14 @@ public class SpriteSheet extends Sprite {
 		return true;
 	}
 
-	private boolean load() {
-		File file = new File("assets/sprites/" + this.name + ".sheet");
+	@Override
+	protected boolean load() {
+		if (!super.load()) {
+			return false;
+		}
+		String filepath = "assets/sprites/" + this.name + ".sheet";
 		try {
+			File file = new File(filepath);
 			if (!file.exists()) {
 				System.out.println("ERROR: " + file.toString() + " could not be loaded.");
 				return false;
@@ -81,13 +77,13 @@ public class SpriteSheet extends Sprite {
 			this.setIndex(0);
 			sheetFile.close();
 		} catch (EOFException error) {
-			System.out.println("ERROR: EOF reached while processing" + file.toString());
+			System.out.println("ERROR: EOF reached while processing" + filepath);
 			return false;
 		} catch (FileNotFoundException error) {
-			System.out.println("ERROR: File could not be found while processing " + file.toString());
+			System.out.println("ERROR: File could not be found while processing " + filepath);
 			return false;
 		} catch (IOException error) {
-			System.out.println("ERROR: While processing " + file.toString());
+			System.out.println("ERROR: While processing " + filepath);
 			return false;
 		}
 

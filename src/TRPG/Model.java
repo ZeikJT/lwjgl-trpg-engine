@@ -1,7 +1,5 @@
 package TRPG;
 
-import TRPG.ModelData;
-
 import java.util.WeakHashMap;
 
 public class Model {
@@ -31,7 +29,7 @@ public class Model {
 		this.name = name;
 	}
 
-	public Model position(xpos, ypos, zpos) {
+	public Model position(float xpos, float ypos, float zpos) {
 		this.xpos = xpos;
 		this.ypos = ypos;
 		this.zpos = zpos;

@@ -95,7 +95,7 @@ public class Main implements KeyboardEvents.Listener {
 			for (int j = 0; j < worldHeight; j += 1) {
 				float ypos = rand.nextFloat();
 				heightMap[i][j] = ypos;
-				models.add(new Model("Grass").scale(i, ypos, j));
+				models.add(new Model("Grass").position(i, 0, j).scale(1f, ypos, 1f));
 			}
 		}
 		// Random box locations
